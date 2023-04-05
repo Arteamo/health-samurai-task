@@ -7,6 +7,7 @@ A Clojure CRUD application made as part of a test for job applicants.
 * Clojurescript
 * Reagent
 * JSON RPC
+* Postgres
 
 ## Usage
 

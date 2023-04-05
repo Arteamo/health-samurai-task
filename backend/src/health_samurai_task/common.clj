@@ -22,7 +22,6 @@
 (s/def ::->long
   (with-conformer #(Long/parseLong (str %))))
 
-
 (defn validate [spec payload]
   (s/conform spec payload))
 

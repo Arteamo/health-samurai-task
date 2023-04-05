@@ -10,8 +10,7 @@
     (db/build-query {})
     (is (= (db/build-query {}) no-filter-result)))
   (testing "with full filter"
-    (let [query (db/build-query {
-                                 :name         "Name"
+    (let [query (db/build-query {:name         "Name"
                                  :lastname     "Lastname"
                                  :patronymic   "Patronymic"
                                  :gender       "male"
