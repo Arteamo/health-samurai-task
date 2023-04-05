@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: health-samurai
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      nodeSelector:
+        type: backend
+      containers:
+        - name: backend
+          image: health-samurai-crud-backend
+          ports:
+            - containerPort: 8080
+      restartPolicy: Always
