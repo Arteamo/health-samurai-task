@@ -1,0 +1,75 @@
+### select
+
+POST http://{{host}}:{{port}}/rpc
+Content-Type: application/json
+
+{
+  "method": "list",
+  "params": {
+
+  }
+}
+
+### select with filter
+
+POST http://{{host}}:{{port}}/rpc
+Content-Type: application/json
+
+{
+  "method": "list",
+  "params": {
+    "name": "Ig"
+  }
+}
+
+### delete
+
+POST http://{{host}}:{{port}}/rpc
+Content-Type: application/json
+
+{
+  "method": "delete",
+  "params": {
+    "insurance_id": 1000
+  }
+}
+
+### create new
+
+POST http://{{host}}:{{port}}/rpc
+Content-Type: application/json
+
+{
+  "method": "create",
+  "params": {
+    "name": "Ivan",
+    "lastname": "Ivanov",
+    "patronymic": null,
+    "birthday": "1990-01-01",
+    "gender": "male",
+    "address": "City A, st. B, 5",
+    "insurance_id": 10009
+  }
+}
+
+### update
+
+POST http://{{host}}:{{port}}/rpc
+Content-Type: application/json
+
+{
+  "method": "update",
+  "params": {
+    "name": "Igor",
+    "insurance_id": 1000
+  }
+}
+
+### list genders
+POST http://{{host}}:{{port}}/rpc
+Content-Type: application/json
+
+{
+  "method": "list-genders",
+  "params": {}
+}

@@ -1,0 +1,11 @@
+/.idea/
+/backend/target/
+/backend/.lein-failures
+/backend/.nrepl-port
+/backend/backend.iml
+/backend/health-samurai-task.iml
+/frontend/public/js/
+/frontend/frontend.iml
+/frontend/pom.xml
+/frontend/node_modules/
+/health-samurai-task.iml
