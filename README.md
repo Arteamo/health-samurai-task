@@ -3,8 +3,11 @@
 A Clojure CRUD application made as part of a test for job applicants.
 
 ## Instruments and practices
-* Ring
+* Ring Jetty
+* Clojurescript
+* Reagent
 * JSON RPC
+
 ## Usage
 
 ### Run backend
@@ -17,3 +20,7 @@ A Clojure CRUD application made as part of a test for job applicants.
 `shadow-cljs compile app`
 
 `shadow-cljs server`
+
+### TODO
+* Docker and K8
+* Build pipeline
