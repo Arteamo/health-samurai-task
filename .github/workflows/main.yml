@@ -3,7 +3,7 @@ name: Build Flow
 on: [ push ]
 
 jobs:
-  build:
+  build-backend:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
