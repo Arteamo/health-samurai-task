@@ -21,7 +21,3 @@ A Clojure CRUD application made as part of a test for job applicants.
 `shadow-cljs compile app`
 
 `shadow-cljs server`
-
-### TODO
-* Docker and K8
-* Build pipeline
