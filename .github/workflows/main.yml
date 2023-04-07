@@ -4,15 +4,23 @@ on: [ push ]
 
 jobs:
   build-backend:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-java@v2
+      - name: 'Checkout'
+        uses: actions/checkout@v3
+      - name: 'Setup jdk'
+        uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
           java-version: '17'
           java-package: jdk
-#      - name: Build with lein
-#        run: lein uberjar
-#      - name: Run tests
-#        run: lein test
+      - name: 'Setup clojure tools'
+        uses: DeLaGuardo/setup-clojure@10.2
+        with:
+          lein: latest
+      - name: Build with lein
+        working-directory: './backend'
+        run: lein uberjar
+      - name: Run tests
+        working-directory: './backend'
+        run: lein test
