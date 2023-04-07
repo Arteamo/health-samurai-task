@@ -1,0 +1,4 @@
+{:host     "{{DB_HOST}}"
+ :port     "{{DB_PORT}}"
+ :user     "crud_user"
+ :password "password"}
