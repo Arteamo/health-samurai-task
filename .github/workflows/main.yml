@@ -24,3 +24,18 @@ jobs:
       - name: Run tests
         working-directory: './backend'
         run: lein test
+  build-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v3
+      - name: 'Setup npm'
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: 'Install shadow-cljs'
+        working-directory: './frontend'
+        run: npm install -g shadow-cljs
+      - name: 'Build frontend'
+        working-directory: './frontend'
+        run: npm run release
