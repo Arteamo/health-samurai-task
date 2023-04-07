@@ -18,12 +18,28 @@ jobs:
         uses: DeLaGuardo/setup-clojure@10.2
         with:
           lein: latest
-      - name: Build with lein
+      - name: 'Restore clojure dependencies'
+        uses: actions/cache/restore@v3
+        with:
+          path: |
+            ~/.m2/repository
+            ~/.gitlibs
+            ~/.deps.clj
+          key: cljdeps-${{ hashFiles('backend/project.clj') }}
+      - name: 'Build with lein'
         working-directory: './backend'
         run: lein uberjar
-      - name: Run tests
+      - name: 'Run tests'
         working-directory: './backend'
         run: lein test
+      - name: 'Cache clojure dependencies'
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.m2/repository
+            ~/.gitlibs
+            ~/.deps.clj
+          key: cljdeps-${{ hashFiles('backend/project.clj') }}
   build-frontend:
     runs-on: ubuntu-latest
     steps:
