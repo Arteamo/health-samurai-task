@@ -49,9 +49,35 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
+      - name: 'Restore npm dependencies'
+        uses: actions/cache/restore@v3
+        with:
+          path: ~/.npm
+          key: npm-${{ hashFiles('frontend/package-lock.json') }}
+      - name: 'Restore clojurescript dependencies'
+        uses: actions/cache/restore@v3
+        with:
+          path: |
+            ~/.m2/repository
+            ~/.gitlibs
+            ~/.deps.clj
+          key: cljdeps-${{ hashFiles('frontend/shadow-cljs.edn') }}
       - name: 'Install shadow-cljs'
         working-directory: './frontend'
         run: npm install -g shadow-cljs
       - name: 'Build frontend'
         working-directory: './frontend'
         run: npm run release
+      - name: 'Cache npm dependencies'
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: npm-${{ hashFiles('frontend/package-lock.json') }}
+      - name: 'Cache clojurescript dependencies'
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.m2/repository
+            ~/.gitlibs
+            ~/.deps.clj
+          key: cljdeps-${{ hashFiles('frontend/shadow-cljs.edn') }}
