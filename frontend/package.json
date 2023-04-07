@@ -1,9 +1,8 @@
 {
   "scripts": {
-    "compile": "npm install && shadow-cljs compile app",
     "server": "shadow-cljs server",
     "start": "shadow-cljs compile app && shadow-cljs server",
-    "release": "shadow-cljs release app"
+    "release": "npm install && shadow-cljs release app"
   },
   "dependencies": {
     "create-react-class": "^15.6.2",
