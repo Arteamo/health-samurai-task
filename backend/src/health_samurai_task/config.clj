@@ -51,7 +51,7 @@
   (common/validate-or-throw ::conf conf))
 
 (defn- set-config [conf]
-  (reset! config-atom (merge conf)))
+  (reset! config-atom conf))
 
 (defn load-config []
   (-> config-file read-from-jar edn/read-string coerce-config set-config))
