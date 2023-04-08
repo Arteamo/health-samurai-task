@@ -41,7 +41,7 @@
     (catch Throwable e (do-error e))))
 
 (defn app [request]
-  (wrap-json-rpc #(let [{:keys [uri request-method]} request]
+  (wrap-json-rpc #(let [{:keys [request-method uri]} request]
                     (case [(name request-method) uri]
                       ["post" "/rpc"] (serve-rpc request)
                       ["options" "/rpc"] {}

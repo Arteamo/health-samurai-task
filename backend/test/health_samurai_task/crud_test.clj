@@ -44,6 +44,7 @@
                     :patronymic "c"
                     :address    "addr"
                     :gender     "male"})
+
 (deftest test-update-validation
   (testing valid
     (test-optional-fields ::crud/update update-fields :insurance_id 1000 should-be-valid)
@@ -56,6 +57,7 @@
                     :lastname     "b"
                     :patronymic   "c"
                     :insurance_id 1000})
+
 (deftest test-search-validation
   (testing valid
     (should-be-valid ::crud/search {})

@@ -59,3 +59,6 @@
 
 (defn delete [id]
   (jdbc/delete! (pg-db) :patient ["insurance_id = ?" id]))
+
+(defn truncate []
+  (jdbc/db-do-commands (pg-db) "TRUNCATE patient"))

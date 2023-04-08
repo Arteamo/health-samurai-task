@@ -45,17 +45,22 @@
 (s/def ::delete
   (s/keys :req-un [:params/insurance_id]))
 
+(def create-response {:status "CREATED"})
+
 (defn create [params]
   (db/insert (validate-or-throw ::create params))
-  {:status "CREATED"})
+  create-response)
 
 (defn search [params]
   (db/select (validate-or-throw ::search params)))
 
+(def update-response {:status "UPDATED"})
+
 (defn update [params]
   (db/update (validate-or-throw ::update params))
-  {:status "UPDATED"})
+  update-response)
 
+(def delete-response {:status "DELETED"})
 (defn delete [params]
   (db/delete (:insurance_id (validate-or-throw ::delete params)))
-  {:status "DELETED"})
+  delete-response)
