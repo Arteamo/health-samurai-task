@@ -94,9 +94,9 @@
 (def search-fields {:name       "A"
                     :lastname   "A"
                     :patronymic "A"
-                    :address    "A"}
+                    :address    "A"})
 
-  defn- assert-rpc-response [actual expected]
+(defn- assert-rpc-response [actual expected]
   (is (= actual (wrap-response expected))))
 
 (deftest test-crud
