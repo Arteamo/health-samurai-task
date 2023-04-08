@@ -1,6 +1,3 @@
-CREATE DATABASE crud;
-\connect crud;
-
 CREATE TABLE IF NOT EXISTS patient
 (
     name         TEXT NOT NULL,
