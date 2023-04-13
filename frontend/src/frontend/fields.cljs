@@ -21,8 +21,8 @@
 (defn on-creation-change [form-atom id e]
   (swap! form-atom assoc id (-> e .-target .-value)))
 
-(defn creation-input-field [form-atom id label type]
-  (input-field form-atom id label type true on-creation-change))
+(defn creation-input-field [form-atom id label type required]
+  (input-field form-atom id label type required on-creation-change))
 
 (defn search-on-change [form-atom id e]
   (if-let [param (-> e .-target .-value not-empty)]

@@ -25,13 +25,13 @@
         [:button.btn.btn-primary.dropdown-toggle
          {:data-bs-toggle "dropdown" :aria-expanded "false" :data-bs-auto-close "outside"} "Create new"]
         [:form.dropdown-menu.p-4 {:on-submit (fn [e] (submit-creation e patient))}
-         (field/creation-input-field patient :name "First name" "text")
-         (field/creation-input-field patient :lastname "Last name" "text")
-         (field/creation-input-field patient :patronymic "Patronymic" "text")
+         (field/creation-input-field patient :name "First name" "text" true)
+         (field/creation-input-field patient :lastname "Last name" "text" true)
+         (field/creation-input-field patient :patronymic "Patronymic" "text" false)
          (field/gender-field patient)
-         (field/creation-input-field patient :address "Address" "text")
-         (field/creation-input-field patient :birthday "Birthday" "date")
-         (field/creation-input-field patient :insurance_id "Insurance id" "number")
+         (field/creation-input-field patient :address "Address" "text" true)
+         (field/creation-input-field patient :birthday "Birthday" "date" true)
+         (field/creation-input-field patient :insurance_id "Insurance id" "number" true)
          [:input.btn.btn-primary {:type "submit" :value "Create"}]]])]))
 
 (defn submit-edit [e patient-atom]
