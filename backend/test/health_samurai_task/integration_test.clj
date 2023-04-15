@@ -11,11 +11,11 @@
     env-var
     default))
 
-(def state {:user     "crud_user"
-            :password "password"
-            :dbname   "crud_test"
-            :host     (get-var "DB_HOST" "localhost")
-            :port     (Long/parseLong (get-var "DB_PORT" "5432"))})
+(def state {:db {:user     "crud_user"
+                 :password "password"
+                 :dbname   "crud_test"
+                 :host     (get-var "DB_HOST" "localhost")
+                 :port     (Long/parseLong (get-var "DB_PORT" "5432"))}})
 
 (defn- fix-truncate-table [t]
   (db/truncate state)
