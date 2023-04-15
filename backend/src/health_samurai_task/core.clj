@@ -5,7 +5,11 @@
     [health-samurai-task.config :refer [load-config]])
   (:gen-class))
 
+(defn build-state []
+  (let [db-config (load-config)]
+    {:db db-config}))
+
 (defn -main [& _]
-  (load-config)
   (Class/forName "org.postgresql.Driver")
-  (run-jetty app {:port 8080}))
+  (let [state (build-state)]
+    (run-jetty #(app state %) {:port 8080})))

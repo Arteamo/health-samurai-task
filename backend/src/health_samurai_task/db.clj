@@ -1,15 +1,14 @@
 (ns health-samurai-task.db
   (:require [clojure.java.jdbc :as jdbc]
-            [clojure.string :as str]
-            [health-samurai-task.config :as config])
+            [clojure.string :as str])
   (:import (java.sql Date)))
 
 (def db-static-params {:dbtype     "postgresql"
-                       :dbname     "crud"
                        :ssl        false
                        :sslfactory "org.postgresql.ssl.NonValidatingFactory"})
 
-(defn pg-db [] (merge db-static-params @config/config-atom))
+(defn- pg-db [state]
+  (merge db-static-params (:db state)))
 
 (extend-protocol jdbc/IResultSetReadColumn
   Date
@@ -28,8 +27,8 @@
   (let [[k _] kv]
     (str (name k) " " (get string-search k eq) " ?")))
 
-(defn insert [entity]
-  (jdbc/insert! (pg-db) :patient entity))
+(defn insert [state entity]
+  (jdbc/insert! (pg-db state) :patient entity))
 
 (defn- build-clauses [filter]
   (str/join " AND " (into [] (for [kv filter]
@@ -49,16 +48,16 @@
       (str "%" (second kv) "%")
       (second kv))))
 
-(defn select [filter]
-  (jdbc/query (pg-db)
+(defn select [state filter]
+  (jdbc/query (pg-db state)
               (cons (build-query filter)
                     (extract-values filter))))
 
-(defn update [entity]
-  (jdbc/update! (pg-db) :patient entity ["insurance_id = ?" (:insurance_id entity)]))
+(defn update [state entity]
+  (jdbc/update! (pg-db state) :patient entity ["insurance_id = ?" (:insurance_id entity)]))
 
-(defn delete [id]
-  (jdbc/delete! (pg-db) :patient ["insurance_id = ?" id]))
+(defn delete [state id]
+  (jdbc/delete! (pg-db state) :patient ["insurance_id = ?" id]))
 
-(defn truncate []
-  (jdbc/db-do-commands (pg-db) "TRUNCATE patient"))
+(defn truncate [state]
+  (jdbc/db-do-commands (pg-db state) "TRUNCATE patient"))
