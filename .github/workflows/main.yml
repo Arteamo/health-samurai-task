@@ -11,7 +11,7 @@ jobs:
         env:
           POSTGRES_USER: crud_user
           POSTGRES_PASSWORD: password
-          POSTGRES_DB: crud
+          POSTGRES_DB: crud_test
         ports:
           - 5432:5432
         options: >-
@@ -33,7 +33,7 @@ jobs:
         with:
           lein: latest
       - name: 'Setup test DB'
-        run: psql -U crud_user -h localhost -d crud -p 5432 -f init.sql
+        run: psql -U crud_user -h localhost -d crud_test -p 5432 -f init.sql
         working-directory: './backend/resources'
         env:
           PGPASSWORD: password
@@ -53,6 +53,7 @@ jobs:
         env:
           DB_HOST: localhost
           DB_PORT: 5432
+          DB_NAME: crud_test
         run: lein test
       - name: 'Cache clojure dependencies'
         uses: actions/cache@v3

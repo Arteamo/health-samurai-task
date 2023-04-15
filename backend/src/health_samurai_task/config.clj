@@ -29,19 +29,20 @@
     ::common/ne-string
     (common/with-conformer get-long-var)))
 
-(def config-atom (atom nil))
 (def config-file "config.edn")
 
 (s/def :db/host ::->env-string)
 (s/def :db/port ::->env-long)
 (s/def :db/user ::common/ne-string)
 (s/def :db/password ::common/ne-string)
+(s/def :db/dbname ::->env-string)
 
 (s/def ::conf
   (s/keys :req-un [:db/host
                    :db/port
                    :db/user
-                   :db/password]))
+                   :db/password
+                   :db/dbname]))
 
 (defn- read-from-jar [path]
   (with-open [r (RT/resourceAsStream (RT/baseLoader) path)]
@@ -50,8 +51,5 @@
 (defn- coerce-config [conf]
   (common/validate-or-throw ::conf conf))
 
-(defn- set-config [conf]
-  (reset! config-atom conf))
-
 (defn load-config []
-  (-> config-file read-from-jar edn/read-string coerce-config set-config))
+  (-> config-file read-from-jar edn/read-string coerce-config))
