@@ -1,6 +1,6 @@
 (ns health-samurai-task.db
   (:require [clojure.java.jdbc :as jdbc]
-            [clojure.string :as str])
+            [honey.sql :as sql])
   (:import (java.sql Date)))
 
 (def db-static-params {:dbtype     "postgresql"
@@ -15,49 +15,48 @@
   (result-set-read-column [v _ _]
     (.toString (.toLocalDate v))))
 
-(def case-insensitive-like "ILIKE")
-(def eq "=")
-(def string-search
-  {:name       case-insensitive-like
-   :lastname   case-insensitive-like
-   :patronymic case-insensitive-like
-   :address    case-insensitive-like})
+(defn- build-string-search [k v]
+  [:ilike k (str "%" v "%")])
 
-(defn- get-operation [kv]
-  (let [[k _] kv]
-    (str (name k) " " (get string-search k eq) " ?")))
+(defn- build-eq-search [k v]
+  [:= k v])
 
-(defn insert [state entity]
-  (jdbc/insert! (pg-db state) :patient entity))
+(def search-map
+  {:name         build-string-search
+   :lastname     build-string-search
+   :patronymic   build-string-search
+   :insurance_id build-eq-search})
 
 (defn- build-clauses [filter]
-  (str/join " AND " (into [] (for [kv filter]
-                               (get-operation kv)))))
+  (for [[k v] filter]
+    ((get search-map k) k v)))
 
 (defn- transform-filter [filter]
   (if-let [clauses (not-empty (build-clauses filter))]
-    (str " WHERE " clauses)
-    ""))
+    {:where (cons :and clauses)}
+    {}))
 
 (defn build-query [filter]
-  (str "SELECT * FROM patient" (transform-filter filter)))
-
-(defn extract-values [filter]
-  (for [kv filter]
-    (if (contains? string-search (first kv))
-      (str "%" (second kv) "%")
-      (second kv))))
+  (sql/format (merge {:select :* :from :patient} (transform-filter filter))))
 
 (defn select [state filter]
-  (jdbc/query (pg-db state)
-              (cons (build-query filter)
-                    (extract-values filter))))
+  (jdbc/query (pg-db state) (build-query filter)))
+
+(defn- execute [state data]
+  (jdbc/execute! (pg-db state) (sql/format data)))
+
+(defn insert [state entity]
+  (execute state {:insert-into :patient
+                  :values      [entity]}))
 
 (defn update [state entity]
-  (jdbc/update! (pg-db state) :patient entity ["insurance_id = ?" (:insurance_id entity)]))
+  (execute state {:update :patient
+                  :set    (dissoc entity :insurance_id)
+                  :where  [:= :insurance_id (:insurance_id entity)]}))
 
 (defn delete [state id]
-  (jdbc/delete! (pg-db state) :patient ["insurance_id = ?" id]))
+  (execute state {:delete-from :patient
+                  :where       [:= :insurance_id id]}))
 
 (defn truncate [state]
-  (jdbc/db-do-commands (pg-db state) "TRUNCATE patient"))
+  (execute state {:truncate :patient}))

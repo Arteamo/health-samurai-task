@@ -12,4 +12,4 @@
 (defn -main [& _]
   (Class/forName "org.postgresql.Driver")
   (let [state (build-state)]
-    (run-jetty #(#'app state %) {:port 8080})))
+    (run-jetty #(#'app state %) {:port 8080 :join? false})))

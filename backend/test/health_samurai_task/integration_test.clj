@@ -89,10 +89,10 @@
 
 (def updated-patient-a (merge patient-a update-fields))
 
-(def search-fields {:name       "A"
-                    :lastname   "A"
-                    :patronymic "A"
-                    :address    "A"})
+(def search-fields {:name         "A"
+                    :lastname     "A"
+                    :patronymic   "A"
+                    :insurance_id 11})
 
 (defn- assert-rpc-response [actual expected]
   (is (= actual (wrap-response expected))))
