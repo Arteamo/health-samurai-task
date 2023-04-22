@@ -8,4 +8,4 @@
 (defn -main [& _]
   (load-config)
   (Class/forName "org.postgresql.Driver")
-  (run-jetty app {:port 8080}))
+  (run-jetty #'app {:port 8080}))

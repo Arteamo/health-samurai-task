@@ -10,6 +10,7 @@
                  [org.clojure/data.json "2.4.0"]
                  [org.clojure/java.jdbc "0.7.12"]
                  [org.postgresql/postgresql "42.5.4"]
+                 [com.github.seancorfield/honeysql "2.4.1026"]
                  [org.clojure/math.combinatorics "0.2.0" :scope "test"]]
   :main health-samurai-task.core
   :aot [health-samurai-task.core])
