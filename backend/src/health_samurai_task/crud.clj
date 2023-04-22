@@ -47,20 +47,21 @@
 
 (def create-response {:status "CREATED"})
 
-(defn create [params]
-  (db/insert (validate-or-throw ::create params))
+(defn create [state params]
+  (db/insert state (validate-or-throw ::create params))
   create-response)
 
-(defn search [params]
-  (db/select (validate-or-throw ::search params)))
+(defn search [state params]
+  (db/select state (validate-or-throw ::search params)))
 
 (def update-response {:status "UPDATED"})
 
-(defn update [params]
-  (db/update (validate-or-throw ::update params))
+(defn update [state params]
+  (db/update state (validate-or-throw ::update params))
   update-response)
 
 (def delete-response {:status "DELETED"})
-(defn delete [params]
-  (db/delete (:insurance_id (validate-or-throw ::delete params)))
+
+(defn delete [state params]
+  (db/delete state (:insurance_id (validate-or-throw ::delete params)))
   delete-response)

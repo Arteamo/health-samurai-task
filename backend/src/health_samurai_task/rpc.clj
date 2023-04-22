@@ -6,13 +6,13 @@
 (defn convert-request [content]
   (json/read-str content :key-fn keyword))
 
-(defn serve-rpc [request]
+(defn serve-rpc [state request]
   (let [[method params] (-> request :body slurp convert-request (map [:method :params]))]
     (case method
-      "list" (crud/search params)
-      "create" (crud/create params)
-      "delete" (crud/delete params)
-      "update" (crud/update params)
+      "list" (crud/search state params)
+      "create" (crud/create state params)
+      "delete" (crud/delete state params)
+      "update" (crud/update state params)
       "list-genders" crud/genders
       (throw (ex-info "Unknown method" {:method method})))))
 
@@ -40,9 +40,9 @@
     (do-result (f))
     (catch Throwable e (do-error e))))
 
-(defn app [request]
+(defn app [state request]
   (wrap-json-rpc #(let [{:keys [request-method uri]} request]
                     (case [(name request-method) uri]
-                      ["post" "/rpc"] (serve-rpc request)
+                      ["post" "/rpc"] (serve-rpc state request)
                       ["options" "/rpc"] {}
                       (illegal-path request)))))

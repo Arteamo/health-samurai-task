@@ -2,7 +2,6 @@
   (:require [clojure.test :refer :all]
             [health-samurai-task.crud :as crud]
             [health-samurai-task.rpc :as rpc]
-            [health-samurai-task.config :as config]
             [health-samurai-task.db :as db]
             [clojure.data.json :as json])
   (:import (java.io ByteArrayInputStream)))
@@ -12,18 +11,17 @@
     env-var
     default))
 
-(defn- fix-setup-config [t]
-  (reset! config/config-atom {:user     "crud_user"
-                              :password "password"
-                              :host     (get-var "DB_HOST" "localhost")
-                              :port     (Long/parseLong (get-var "DB_PORT" "5432"))})
-  (t))
+(def state {:db {:user     "crud_user"
+                 :password "password"
+                 :dbname   "crud_test"
+                 :host     (get-var "DB_HOST" "localhost")
+                 :port     (Long/parseLong (get-var "DB_PORT" "5432"))}})
 
 (defn- fix-truncate-table [t]
-  (db/truncate)
+  (db/truncate state)
   (t))
 
-(use-fixtures :once fix-setup-config fix-truncate-table)
+(use-fixtures :once fix-truncate-table)
 
 (defn- string->stream [s]
   (-> s
@@ -40,25 +38,25 @@
   (rpc/do-result body))
 
 (defn- request-genders []
-  (rpc/app (wrap-request "list-genders" {})))
+  (rpc/app state (wrap-request "list-genders" {})))
 
 (defn- request-creation [patient]
-  (rpc/app (wrap-request "create" patient)))
+  (rpc/app state (wrap-request "create" patient)))
 
 (defn- request-search [filter]
-  (rpc/app (wrap-request "list" filter)))
+  (rpc/app state (wrap-request "list" filter)))
 
 (defn- request-update [patch]
-  (rpc/app (wrap-request "update" patch)))
+  (rpc/app state (wrap-request "update" patch)))
 
 (defn- request-deletion [id]
-  (rpc/app (wrap-request "delete" {:insurance_id id})))
+  (rpc/app state (wrap-request "delete" {:insurance_id id})))
 
 (defn- assert-db-state
   ([expected]
    (assert-db-state expected {}))
   ([expected filter]
-   (let [state (into #{} (db/select filter))]
+   (let [state (into #{} (db/select state filter))]
      (is (= state expected)))))
 
 (deftest get-genders-enum-test
