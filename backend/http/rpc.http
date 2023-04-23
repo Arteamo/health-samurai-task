@@ -2,6 +2,7 @@
 
 POST http://{{host}}:{{port}}/rpc
 Content-Type: application/json
+Accept: application/json
 
 {
   "method": "list",
@@ -9,6 +10,15 @@ Content-Type: application/json
 
   }
 }
+
+### select (edn)
+POST http://{{host}}:{{port}}/rpc
+Content-Type: application/edn
+Accept: application/edn
+
+{:method "list"
+ :params {}}
+
 
 ### select with filter
 

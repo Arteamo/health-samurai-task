@@ -31,11 +31,11 @@
 (defn- wrap-request [method body]
   (let [b (-> {:method method :params body} json/write-str string->stream)]
     {:uri            "/rpc"
-     :request-method "post"
+     :request-method :post
      :body           b}))
 
 (defn- wrap-response [body]
-  (rpc/do-result body))
+  (rpc/wrap-response {} {} (fn [] body)))
 
 (defn- request-genders []
   (rpc/app state (wrap-request "list-genders" {})))

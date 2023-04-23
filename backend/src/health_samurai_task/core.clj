@@ -2,7 +2,8 @@
   (:require
     [ring.adapter.jetty :refer [run-jetty]]
     [health-samurai-task.rpc :refer [app]]
-    [health-samurai-task.config :refer [load-config]])
+    [health-samurai-task.config :refer [load-config]]
+    [ring.middleware.params :refer [wrap-params]])
   (:gen-class))
 
 (defn build-state []
@@ -12,4 +13,4 @@
 (defn -main [& _]
   (Class/forName "org.postgresql.Driver")
   (let [state (build-state)]
-    (run-jetty #(#'app state %) {:port 8080 :join? false})))
+    (run-jetty (wrap-params #(#'app state %)) {:port 8080 :join? false})))
