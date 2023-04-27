@@ -83,3 +83,6 @@ Content-Type: application/json
   "method": "list-genders",
   "params": {}
 }
+
+### cors
+OPTIONS http://{{host}}:{{port}}/rpc

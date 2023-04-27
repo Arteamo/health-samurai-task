@@ -2,13 +2,8 @@
   (:require
     [clojure.core :as core]
     [clojure.data.json :as json]
-    [health-samurai-task.crud :as crud]))
-
-(defn convert-json-request [content]
-  (json/read-str content :key-fn keyword))
-
-(defn convert-edn-request [content]
-  (core/read-string content))
+    [health-samurai-task.crud :as crud])
+  (:import (java.io EOFException)))
 
 (defn- illegal-path [request-method uri]
   (throw (ex-info "404 NOT FOUND" {:method request-method :uri uri})))
@@ -18,22 +13,30 @@
     (case type
       "application/json" :json
       "application/edn" :edn
-      (throw (ex-info "Unknown mime-type" {:got type})))
+      :json)
     :json))
 
-(defmulti wrap-request
-          (fn [query-params headers _]
-            (get-content-keyword query-params headers "content-type")))
+(defmulti build-wrapped-body
+          (fn [request]
+            (let [{:keys [query-params headers]} request]
+              (get-content-keyword query-params headers "content-type"))))
 
-(defmethod wrap-request :json [_ _ body]
-  (-> body slurp convert-json-request (select-keys [:method :params])))
+(defmethod build-wrapped-body :json [request]
+  (-> (:body request) slurp (json/read-str :key-fn keyword) (select-keys [:method :params])))
 
-(defmethod wrap-request :edn [_ _ body]
-  (-> body slurp convert-edn-request))
+(defmethod build-wrapped-body :edn [request]
+  (-> (:body request) slurp core/read-string))
 
-(defmulti wrap-response
-          (fn [query-params headers _]
-            (get-content-keyword query-params headers "accept")))
+(defn- build-wrapped-req [request]
+  (let [{:keys [query-params headers request-method uri]} request]
+    {:body           (try (build-wrapped-body request) (catch EOFException _ {}))
+     :request-method request-method
+     :uri            uri
+     :accept         (get-content-keyword query-params headers "accept")}))
+
+(defn wrap-request [handler]
+  (fn [request]
+    (handler (build-wrapped-req request))))
 
 (def common-headers {"Access-Control-Allow-Origin"  "*"
                      "Access-Control-Allow-Methods" "POST, OPTIONS"
@@ -47,15 +50,17 @@
 (defn- build-headers [content-keyword]
   (assoc common-headers "Content-Type" (get-content-type content-keyword)))
 
-(defmethod wrap-response :json [_ _ f]
+(defmulti do-result (fn [response] (:accept response)))
+
+(defmethod do-result :json [result]
   {:status  200
    :headers (build-headers :json)
-   :body    (json/write-str {:result (f)})})
+   :body    (json/write-str (select-keys result [:result]))})
 
-(defmethod wrap-response :edn [_ _ f]
+(defmethod do-result :edn [result]
   {:status  200
    :headers (build-headers :edn)
-   :body    (str {:result (f)})})
+   :body    (str (select-keys result [:result]))})
 
 (defn do-error [exception]
   (.printStackTrace exception)
@@ -63,10 +68,11 @@
    :headers (build-headers :json)
    :body    (json/write-str {:error (.getMessage exception)})})
 
-(defn wrap-rpc [query-params headers f]
-  (try
-    (wrap-response query-params headers f)
-    (catch Throwable e (do-error e))))
+(defn wrap-rpc [handler]
+  (fn [request]
+    (try
+      (do-result (handler request))
+      (catch Throwable e (do-error e)))))
 
 (defn serve-rpc [state request]
   (let [{:keys [method params]} request]
@@ -78,11 +84,10 @@
       "list-genders" crud/genders
       (throw (ex-info "Unknown method" {:method method})))))
 
-(defn app [state request]
-  (let [{:keys [request-method uri query-params headers body]} request
-        wrapped-req (wrap-request query-params headers body)]
-    (wrap-rpc query-params headers
-              #(case [request-method uri]
-                 [:post "/rpc"] (serve-rpc state wrapped-req)
-                 [:options "/rpc"] {}
-                 (illegal-path request-method uri)))))
+(defn app [state wrapped-req]
+  (let [{:keys [request-method uri body accept]} wrapped-req]
+    {:result (case [request-method uri]
+               [:post "/rpc"] (serve-rpc state body)
+               [:options "/rpc"] {}
+               (illegal-path request-method uri))
+     :accept accept}))
