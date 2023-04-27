@@ -1,5 +1,6 @@
 (ns health-samurai-task.integration-test
   (:require [clojure.test :refer :all]
+            [health-samurai-task.core :as core]
             [health-samurai-task.crud :as crud]
             [health-samurai-task.rpc :as rpc]
             [health-samurai-task.db :as db]
@@ -28,29 +29,31 @@
       (.getBytes "UTF-8")
       (ByteArrayInputStream.)))
 
-(defn- wrap-request [method body]
+(defn- build-test-req [method body]
   (let [b (-> {:method method :params body} json/write-str string->stream)]
     {:uri            "/rpc"
      :request-method :post
-     :body           b}))
+     :body           b
+     :query-params   {}
+     :headers        {}}))
 
 (defn- wrap-response [body]
-  (rpc/wrap-response {} {} (fn [] body)))
+  (rpc/do-result {:result body :accept :json}))
 
 (defn- request-genders []
-  (rpc/app state (wrap-request "list-genders" {})))
+  ((core/app-with-wrappers state) (build-test-req "list-genders" {})))
 
 (defn- request-creation [patient]
-  (rpc/app state (wrap-request "create" patient)))
+  ((core/app-with-wrappers state) (build-test-req "create" patient)))
 
 (defn- request-search [filter]
-  (rpc/app state (wrap-request "list" filter)))
+  ((core/app-with-wrappers state) (build-test-req "list" filter)))
 
 (defn- request-update [patch]
-  (rpc/app state (wrap-request "update" patch)))
+  ((core/app-with-wrappers state) (build-test-req "update" patch)))
 
 (defn- request-deletion [id]
-  (rpc/app state (wrap-request "delete" {:insurance_id id})))
+  ((core/app-with-wrappers state) (build-test-req "delete" {:insurance_id id})))
 
 (defn- assert-db-state
   ([expected]
