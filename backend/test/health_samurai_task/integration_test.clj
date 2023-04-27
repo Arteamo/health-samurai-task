@@ -97,17 +97,17 @@
 (defn- assert-rpc-response [actual expected]
   (is (= actual (wrap-response expected))))
 
-(deftest test-crud
+(deftest test-crud-json
   (testing "rpc/create"
     (assert-rpc-response (request-creation patient-a) crud/create-response)
     (assert-rpc-response (request-creation patient-b) crud/create-response)
     (assert-db-state #{patient-a patient-b}))
   (testing "rpc/search"
-    (assert-rpc-response (request-search {}) [patient-a patient-b])
-    (assert-rpc-response (request-search {:insurance_id 1}) [])
-    (assert-rpc-response (request-search {:insurance_id 11}) [patient-a])
+    (assert-rpc-response (request-search {}) (list patient-a patient-b))
+    (assert-rpc-response (request-search {:insurance_id 1}) (list))
+    (assert-rpc-response (request-search {:insurance_id 11}) (list patient-a))
     (doseq [[k v] search-fields]
-      (assert-rpc-response (request-search {k v}) [patient-a])))
+      (assert-rpc-response (request-search {k v}) (list patient-a))))
   (testing "rpc/update"
     (assert-rpc-response (request-update update-fields) crud/update-response)
     (assert-db-state #{updated-patient-a patient-b}))
